@@ -1,58 +1,65 @@
-'use client';
+'use client'
 
-import { Card, CardContent, Typography, Button } from '@mui/material';
-import { Room } from '@/types';
-import { MessageCircle } from 'lucide-react';
-import { WHATSAPP_NUMBER } from '@/lib/constants';
-import Image from 'next/image';
+import { WHATSAPP_NUMBER } from '@/lib/constants'
+import { Room } from '@/types'
+import { Box, Button, Card, CardContent, Typography } from '@mui/material'
+import { MapPin, MessageCircle } from 'lucide-react'
+import ImageCarousel from './ImageCarousel'
 
 interface RoomCardProps {
-  room: Room;
+  room: Room
 }
 
 export default function RoomCard({ room }: RoomCardProps) {
   const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-    `Hi, I want to book ${room.name}. Please assist.`
-  )}`;
+    `Hi, I want to book ${room.name}. Please assist.`,
+  )}`
 
   return (
-    <Card className="h-full flex flex-col brutal-card p-0 overflow-hidden">
-      <div className="relative h-64 w-full border-b-4 border-black bg-gray-100">
-        {room.image_url ? (
-          <Image
-            src={room.image_url}
-            alt={room.name}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
-        ) : (
-          <div className="h-full w-full flex items-center justify-center font-bold uppercase">
-            No Image
-          </div>
-        )}
-        <div className="absolute top-4 right-4 bg-primary px-3 py-1 font-black brutal-border z-10">
-          ₹{room.price} / night
+    <Card className="h-full flex flex-col minimal-card overflow-hidden group">
+      <div className="relative h-64 w-full overflow-hidden">
+        <ImageCarousel images={room.image_url} alt={room.name} />
+        <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-4 py-2 rounded-full text-primary font-bold shadow-soft z-10 text-sm">
+          ₹{room.price}{' '}
+          <span className="text-gray-500 font-normal">/ night</span>
         </div>
       </div>
-      <CardContent className="flex-grow flex flex-col p-6">
-        <Typography variant="h5" className="mb-2 font-black leading-tight">
+
+      <CardContent className="grow flex flex-col p-6">
+        <Box className="flex items-center gap-1 text-accent mb-2">
+          <MapPin size={14} />
+          <Typography
+            variant="caption"
+            className="font-semibold uppercase tracking-wider"
+          >
+            Puri, Odisha
+          </Typography>
+        </Box>
+        <Typography
+          variant="h5"
+          className="mb-3 font-bold leading-tight group-hover:text-accent transition-colors"
+        >
           {room.name}
         </Typography>
-        <Typography className="text-gray-600 mb-6 flex-grow">
+        <Typography
+          variant="body2"
+          className="text-secondary mb-8 line-clamp-3"
+        >
           {room.description}
         </Typography>
-        <Button
-          variant="contained"
-          color="secondary"
-          fullWidth
-          className="font-black py-3 text-lg gap-2"
-          onClick={() => window.open(whatsappUrl, '_blank')}
-        >
-          <MessageCircle size={20} />
-          Book via WhatsApp
-        </Button>
+        <div className="mt-auto">
+          <Button
+            variant="contained"
+            color="primary"
+            fullWidth
+            className="rounded-full py-3 gap-2 shadow-soft hover:shadow-soft-md transition-all"
+            onClick={() => window.open(whatsappUrl, '_blank')}
+          >
+            <MessageCircle size={18} />
+            <span className="font-bold">Book Now</span>
+          </Button>
+        </div>
       </CardContent>
     </Card>
-  );
+  )
 }

@@ -4,7 +4,7 @@ export interface Room {
   description: string;
   price: number;
   duration?: string; // e.g. "per night"
-  image_url: string;
+  image_url: string[];
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -16,7 +16,7 @@ export interface Package {
   description: string;
   price: number;
   duration: string; // e.g. "3 Days / 2 Nights"
-  image_url: string;
+  image_url: string[];
   is_active: boolean;
   created_at: string;
   updated_at: string;

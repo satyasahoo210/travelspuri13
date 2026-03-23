@@ -1,60 +1,99 @@
-'use client';
+'use client'
 
-import { useForm } from 'react-hook-form';
-import { TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions, FormControlLabel, Switch } from '@mui/material';
-import { Package } from '@/types';
-import { api } from '@/lib/api';
-import { useState } from 'react';
+import { api } from '@/lib/api'
+import { Package } from '@/types'
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControlLabel,
+  Switch,
+  TextField,
+  Typography,
+} from '@mui/material'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
 
 interface AdminPackageFormProps {
-  packageItem?: Package | null;
-  open: boolean;
-  onClose: (refresh?: boolean) => void;
+  packageItem?: Package | null
+  open: boolean
+  onClose: (refresh?: boolean) => void
 }
 
-export default function AdminPackageForm({ packageItem, open, onClose }: AdminPackageFormProps) {
-  const [loading, setLoading] = useState(false);
-  const { register, handleSubmit, formState: { errors } } = useForm({
-    defaultValues: packageItem ? {
-      ...packageItem,
-      price: packageItem.price
-    } : {
-      name: '',
-      description: '',
-      price: 0,
-      duration: '',
-      image_url: '',
-      is_active: true
-    }
-  });
+export default function AdminPackageForm({
+  packageItem,
+  open,
+  onClose,
+}: AdminPackageFormProps) {
+  const [loading, setLoading] = useState(false)
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    defaultValues: packageItem
+      ? {
+          ...packageItem,
+          image_url: api.deTransformImageUrl(packageItem.image_url),
+          price: packageItem.price,
+        }
+      : {
+          name: '',
+          description: '',
+          price: 0,
+          duration: '',
+          image_url: '',
+          is_active: true,
+        },
+  })
 
-  const onSubmit = async (data: any) => {
-    setLoading(true);
+  const onSubmit = async (
+    data: Pick<Package, 'name' | 'description' | 'price' | 'is_active'> & {
+      image_url: string
+    },
+  ) => {
+    setLoading(true)
     try {
       if (packageItem) {
-        await api.updateItem('packages', { ...data, id: packageItem.id });
+        await api.updateItem('packages', { ...data, id: packageItem.id })
       } else {
-        await api.addItem('packages', data);
+        await api.addItem('packages', data)
       }
-      onClose(true);
+      onClose(true)
     } catch (error) {
-      console.error(error);
-      alert('Failed to save package');
+      console.error(error)
+      alert('Failed to save package')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
-    <Dialog open={open} onClose={() => onClose()} maxWidth="sm" fullWidth>
+    <Dialog
+      open={open}
+      onClose={() => onClose()}
+      maxWidth="sm"
+      fullWidth
+      PaperProps={{ className: 'rounded-2xl shadow-soft-lg' }}
+    >
       <form onSubmit={handleSubmit(onSubmit)}>
-        <DialogTitle className="font-black uppercase">
-          {packageItem ? 'Edit Package' : 'Add New Package'}
+        <DialogTitle className="pt-8 px-8 flex justify-between items-center">
+          <Typography variant="h5" className="font-bold tracking-tight">
+            {packageItem ? 'Edit Package' : 'Create New Package'}
+          </Typography>
         </DialogTitle>
-        <DialogContent className="flex flex-col gap-4 py-4">
+        <DialogContent className="flex flex-col gap-6 py-6 px-8">
+          <Typography variant="body2" className="text-secondary -mb-2">
+            Define the itinerary and pricing for this travel package.
+          </Typography>
+
           <TextField
             {...register('name', { required: 'Name is required' })}
-            label="Package Name"
+            label="Package Title"
+            placeholder="e.g. Golden Triangle Tour (Puri-Konark-Chilika)"
             fullWidth
             error={!!errors.name}
             helperText={errors.name?.message as string}
@@ -62,43 +101,75 @@ export default function AdminPackageForm({ packageItem, open, onClose }: AdminPa
           />
           <TextField
             {...register('description')}
-            label="Description"
+            label="Itinerary Highlights"
+            placeholder="Describe the key attractions and journey..."
             fullWidth
             multiline
-            rows={3}
+            rows={4}
           />
-          <div className="flex gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <TextField
               {...register('price', { required: 'Price is required' })}
-              label="Price (₹)"
+              label="Standard Price (₹)"
               type="number"
               fullWidth
               error={!!errors.price}
             />
             <TextField
               {...register('duration', { required: 'Duration is required' })}
-              label="Duration (e.g. 3D/2N)"
+              label="Duration"
+              placeholder="e.g. 3 Days / 2 Nights"
               fullWidth
               error={!!errors.duration}
             />
           </div>
-          <TextField
-            {...register('image_url')}
-            label="Image URL (Google Drive)"
-            fullWidth
-          />
-          <FormControlLabel
-            control={<Switch {...register('is_active')} defaultChecked={packageItem ? packageItem.is_active : true} />}
-            label="Active"
-          />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-center">
+            <TextField
+              {...register('image_url')}
+              label="Image URL"
+              placeholder="Google Drive Link or ID"
+              fullWidth
+            />
+            <Box className="flex items-center px-3 border border-border rounded-lg bg-gray-50/50 h-[56px]">
+              <FormControlLabel
+                control={
+                  <Switch
+                    {...register('is_active')}
+                    defaultChecked={packageItem ? packageItem.is_active : true}
+                  />
+                }
+                label={
+                  <Typography className="font-medium text-sm">
+                    Active Listing
+                  </Typography>
+                }
+                className="ml-0 w-full justify-between flex-row-reverse"
+              />
+            </Box>
+          </div>
         </DialogContent>
-        <DialogActions className="p-4">
-          <Button onClick={() => onClose()} color="inherit">Cancel</Button>
-          <Button type="submit" variant="contained" color="secondary" disabled={loading}>
-            {loading ? 'Saving...' : 'Save Package'}
+        <DialogActions className="p-8 bg-gray-50/50 border-t border-border flex gap-3">
+          <Button
+            onClick={() => onClose()}
+            className="rounded-full px-6 font-bold text-gray-500 hover:bg-gray-100"
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            disabled={loading}
+            className="rounded-full px-8 py-2.5 font-bold shadow-soft"
+          >
+            {loading
+              ? 'Processing...'
+              : packageItem
+                ? 'Update Package'
+                : 'Add Package'}
           </Button>
         </DialogActions>
       </form>
     </Dialog>
-  );
+  )
 }
