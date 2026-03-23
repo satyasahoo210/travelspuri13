@@ -38,6 +38,23 @@ export const metadata: Metadata = {
     shortcut: '/logo.svg',
     apple: '/logo.png',
   },
+  openGraph: {
+    title: 'Travels Puri 13 | Affordable Stays & Travel Packages in Puri',
+    description:
+      'Experience world-class hospitality, elegant accommodations, and exceptional service at Hotels in Puri.',
+    url: 'https://travelspuri13.com',
+    siteName: 'Travels Puri 13',
+    images: [
+      {
+        url: '/logo.png',
+        width: 1200,
+        height: 630,
+        alt: 'Travels Puri 13 - Hotels and Travel Packages',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
 }
 
 export default function RootLayout({
