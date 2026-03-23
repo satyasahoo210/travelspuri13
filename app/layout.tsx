@@ -47,8 +47,14 @@ export const metadata: Metadata = {
     images: [
       {
         url: '/logo.png',
-        width: 1200,
-        height: 630,
+        width: 240,
+        height: 240,
+        alt: 'Travels Puri 13 - Hotels and Travel Packages',
+      },
+      {
+        url: '/logo_large.png',
+        width: 840,
+        height: 240,
         alt: 'Travels Puri 13 - Hotels and Travel Packages',
       },
     ],
