@@ -1,65 +1,94 @@
-import Image from "next/image";
+import { Button, Container, Grid, Typography } from '@mui/material';
+import { ArrowRight, Hotel, Map } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div className="flex flex-col gap-20 pb-20">
+      {/* Hero Section */}
+      <section className="bg-primary border-b-4 border-black py-24 relative overflow-hidden">
+        <Container maxWidth="lg" className="relative z-10">
+          <div className="max-w-2xl">
+            <Typography variant="h1" className="text-6xl md:text-8xl font-black mb-6 leading-none">
+              Travels <br />
+              <span className="bg-white px-2 inline-block brutal-border mt-2">Puri 13</span>
+            </Typography>
+            <Typography variant="h5" className="font-bold mb-8 uppercase tracking-wide">
+              Affordable Stays & Travel Packages in Puri
+            </Typography>
+            <div className="flex flex-wrap gap-4">
+              <Link href="/rooms">
+                <Button variant="contained" color="secondary" size="large" className="text-xl px-8 py-4">
+                  Browse Rooms
+                </Button>
+              </Link>
+              <Link href="/packages">
+                <Button variant="contained" sx={{ bgcolor: 'white', color: 'black', '&:hover': { bgcolor: '#f0f0f0' } }} size="large" className="text-xl px-8 py-4">
+                  Travel Packages
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </Container>
+        
+        {/* Background elements */}
+        <div className="absolute top-10 right-10 w-64 h-64 border-4 border-black rounded-full opacity-20 -rotate-12 hidden lg:block"></div>
+        <div className="absolute bottom-10 right-20 w-32 h-32 bg-accent brutal-border rotate-12 hidden lg:block"></div>
+      </section>
+
+      {/* Featured Sections placeholder */}
+      <Container maxWidth="lg">
+        <Grid container spacing={8}>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <div className="brutal-card bg-accent text-white h-full flex flex-col justify-between">
+              <div>
+                <Hotel size={48} className="mb-4" strokeWidth={3} />
+                <Typography variant="h3" className="mb-4">Found your stay?</Typography>
+                <Typography className="text-lg opacity-90 mb-6">
+                  From budget-friendly rooms to premium suites near the Jagannath Temple and Sea Beach.
+                </Typography>
+              </div>
+              <Link href="/rooms" className="inline-flex items-center gap-2 font-black uppercase text-xl hover:underline">
+                View All Rooms <ArrowRight />
+              </Link>
+            </div>
+          </Grid>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <div className="brutal-card bg-secondary text-white h-full flex flex-col justify-between">
+              <div>
+                <Map size={48} className="mb-4" strokeWidth={3} />
+                <Typography variant="h3" className="mb-4">Explore Puri</Typography>
+                <Typography className="text-lg opacity-90 mb-6">
+                  Expertly crafted travel packages covering Konark, Chilika, and local sightseeing.
+                </Typography>
+              </div>
+              <Link href="/packages" className="inline-flex items-center gap-2 font-black uppercase text-xl hover:underline">
+                Explore Packages <ArrowRight />
+              </Link>
+            </div>
+          </Grid>
+        </Grid>
+      </Container>
+
+      {/* WhatsApp CTA Section */}
+      <section className="bg-black text-white py-20 border-y-4 border-black">
+        <Container maxWidth="md" className="text-center">
+          <Typography variant="h2" className="text-primary mb-6">Need a custom plan?</Typography>
+          <Typography variant="h6" className="mb-10 opacity-80 uppercase">
+             Chat with our travel experts directly on WhatsApp for personalized bookings.
+          </Typography>
+          <Button 
+            variant="contained" 
+            color="primary" 
+            size="large"
+            className="text-2xl px-12 py-6"
+            // onClick={() => window.open('https://wa.me/91XXXXXXXXXX', '_blank')}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+            Message Us on WhatsApp
+          </Button>
+        </Container>
+      </section>
     </div>
   );
 }
