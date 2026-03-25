@@ -11,8 +11,8 @@ import { useState } from 'react'
 
 const navItems = [
   { name: 'Home', path: '/' },
-  { name: 'Rooms', path: '/rooms' },
-  { name: 'Packages', path: '/packages' },
+  { name: 'Hotels', path: '/hotels' },
+  { name: 'Admin', path: '/admin' },
 ]
 
 export default function Navbar() {

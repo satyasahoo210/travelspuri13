@@ -1,28 +1,41 @@
+export interface Hotel {
+  id: string;
+  name: string;
+  slug: string;
+  location: string;
+  area: string;
+  lat: number;
+  lng: number;
+  rating: number;
+  rating_count: number;
+  starting_price: number;
+  amenities: string; // comma-separated
+  amenities_search: string; // space-separated
+  cover_image: string;
+  image_urls: string[];
+  is_sponsored: boolean;
+  is_active: boolean;
+  created_at: string;
+}
+
 export interface Room {
   id: string;
+  hotel_id: string;
   name: string;
   description: string;
   price: number;
-  duration?: string; // e.g. "per night"
-  image_url: string[];
+  capacity: number;
+  amenities: string;
+  amenities_search: string;
+  image_urls: string[];
+  check_in: string;
+  check_out: string;
+  rules: string;
+  cancellation_policy: string;
   is_active: boolean;
-  created_at: string;
-  updated_at: string;
 }
 
-export interface Package {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  duration: string; // e.g. "3 Days / 2 Nights"
-  image_url: string[];
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-export type ItemType = 'room' | 'package';
+export type ItemType = 'hotel' | 'room';
 
 export interface ApiResponse<T> {
   success: boolean;

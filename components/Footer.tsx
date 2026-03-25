@@ -6,7 +6,7 @@ export default function Footer() {
   return (
     <footer className="bg-gray-50 border-t border-border py-16 mt-auto">
       <Container maxWidth="lg">
-        <Grid container spacing={8}>
+        <Grid container spacing={2}>
           <Grid size={{ xs: 12, md: 5 }}>
             <Typography
               variant="h6"
@@ -21,7 +21,7 @@ export default function Footer() {
             </Typography>
           </Grid>
 
-          <Grid size={{ xs: 6, md: 3 }}>
+          <Grid size={{ xs: 5, md: 3 }}>
             <Typography
               variant="subtitle2"
               className="font-bold mb-6 text-primary uppercase tracking-widest"
@@ -36,16 +36,10 @@ export default function Footer() {
                 Home
               </Link>
               <Link
-                href="/rooms"
+                href="/hotels"
                 className="text-secondary hover:text-accent transition-colors text-sm"
               >
-                Browse Rooms
-              </Link>
-              <Link
-                href="/packages"
-                className="text-secondary hover:text-accent transition-colors text-sm"
-              >
-                Travel Packages
+                Explore Hotels
               </Link>
               <Link
                 href="/admin"
@@ -56,7 +50,7 @@ export default function Footer() {
             </Box>
           </Grid>
 
-          <Grid size={{ xs: 6, md: 4 }}>
+          <Grid size={{ xs: 7, md: 4 }}>
             <Typography
               variant="subtitle2"
               className="font-bold mb-6 text-primary uppercase tracking-widest"
@@ -68,7 +62,8 @@ export default function Footer() {
               <br />
               Puri, Odisha, India - 752001
               <br />
-              <span className="block mt-2 font-medium text-primary">
+              <span className="block mt-2 font-medium text-primary overflow-x-hidden">
+                {/* TODO: fix overflow issue */}
                 Email: {EMAIL_ADDRESS}
               </span>
               <span className="block mt-1 font-medium text-primary">

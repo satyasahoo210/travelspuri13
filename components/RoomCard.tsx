@@ -2,63 +2,112 @@
 
 import { WHATSAPP_NUMBER } from '@/lib/constants'
 import { Room } from '@/types'
-import { Box, Button, Card, CardContent, Typography } from '@mui/material'
-import { MapPin, MessageCircle } from 'lucide-react'
+import { People, Phone, WhatsApp } from '@mui/icons-material'
+import { Box, Button, Card, CardContent, Divider, Stack, Typography } from '@mui/material'
+import AmenityChips from './AmenityChips'
 import ImageCarousel from './ImageCarousel'
 
 interface RoomCardProps {
   room: Room
+  hotelName: string
+  onSelect?: () => void
 }
 
-export default function RoomCard({ room }: RoomCardProps) {
-  const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-    `Hi, I want to book ${room.name}. Please assist.`,
-  )}`
-
+export default function RoomCard({ room, hotelName, onSelect }: RoomCardProps) { 
   return (
-    <Card className="h-full flex flex-col minimal-card overflow-hidden group">
-      <div className="relative h-64 w-full overflow-hidden">
-        <ImageCarousel images={room.image_url} alt={room.name} />
-        <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-4 py-2 rounded-full text-primary font-bold shadow-soft z-10 text-sm">
-          ₹{room.price}{' '}
-          <span className="text-gray-500 font-normal">/ night</span>
-        </div>
-      </div>
+    <Card 
+      className="claymorphic"
+      sx={{ 
+        height: '100%', 
+        display: 'flex', 
+        flexDirection: { xs: 'column', sm: 'row' },
+        borderRadius: '24px',
+        overflow: 'hidden',
+        border: '1px solid #E5E7EB',
+        bgcolor: '#fff'
+      }}
+    >
+      <Box sx={{ position: 'relative', width: { xs: '100%', sm: '40%' }, height: { xs: 240, sm: 'auto' }, overflow: 'hidden' }}>
+        <ImageCarousel images={room.image_urls} alt={room.name} />
+      </Box>
 
-      <CardContent className="grow flex flex-col p-6">
-        <Box className="flex items-center gap-1 text-accent mb-2">
-          <MapPin size={14} />
-          <Typography
-            variant="caption"
-            className="font-semibold uppercase tracking-wider"
-          >
-            Puri, Odisha
+      <CardContent sx={{ flexGrow: 1, p: 4, width: { xs: '100%', sm: '60%' } }}>
+        <Stack direction="row" justifyContent="space-between" alignItems="flex-start" sx={{ mb: 1 }}>
+          <Typography variant="h5" fontWeight={900} sx={{ color: 'primary.main' }}>
+            {room.name}
           </Typography>
-        </Box>
-        <Typography
-          variant="h5"
-          className="mb-3 font-bold leading-tight group-hover:text-accent transition-colors"
-        >
-          {room.name}
-        </Typography>
-        <Typography
-          variant="body2"
-          className="text-secondary mb-8 line-clamp-3"
-        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'text.secondary', bgcolor: '#F8FAFC', px: 1.5, py: 0.5, borderRadius: '12px', border: '1px solid #E2E8F0' }}>
+            <People fontSize="small" />
+            <Typography variant="body2" fontWeight={800}>{room.capacity} Guests</Typography>
+          </Box>
+        </Stack>
+
+        <Typography variant="body1" color="text.secondary" sx={{ mb: 3, lineClamp: 2, display: '-webkit-box', WebkitBoxOrient: 'vertical', overflow: 'hidden', fontWeight: 500 }}>
           {room.description}
         </Typography>
-        <div className="mt-auto">
+
+        <AmenityChips amenities={room.amenities} max={6} />
+
+        <Divider sx={{ my: 3, borderStyle: 'dashed' }} />
+
+        <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Box>
+            <Typography variant="h4" color="primary" fontWeight={950}>
+              ₹{room.price}
+              <Typography component="span" variant="body2" color="text.secondary" sx={{ fontWeight: 700, ml: 0.5 }}>
+                / night
+              </Typography>
+            </Typography>
+          </Box>
+          
           <Button
             variant="contained"
-            color="primary"
-            fullWidth
-            className="rounded-full py-3 gap-2 shadow-soft hover:shadow-soft-md transition-all"
-            onClick={() => window.open(whatsappUrl, '_blank')}
+            onClick={onSelect}
+            sx={{ 
+                borderRadius: '16px', 
+                textTransform: 'none', 
+                fontWeight: 900,
+                px: 4,
+                py: 1.5,
+                fontSize: '1rem',
+                boxShadow: '0 8px 20px rgba(0,0,0,0.1)',
+                display: { xs: 'none', sm: 'block' }
+            }}
           >
-            <MessageCircle size={18} />
-            <span className="font-bold">Book Now</span>
+            Select Room
           </Button>
-        </div>
+        </Box>
+
+        <Stack direction="row" spacing={2}>
+          <Button
+            fullWidth
+            variant="contained"
+            onClick={onSelect}
+            sx={{ 
+                borderRadius: '14px', 
+                textTransform: 'none', 
+                fontWeight: 900,
+                py: 1.5,
+                fontSize: '1rem',
+                display: { xs: 'block', sm: 'none' }
+            }}
+          >
+            Select to Book
+          </Button>
+          <Button
+            variant="outlined"
+            href={`tel:${WHATSAPP_NUMBER}`}
+            sx={{ 
+                borderRadius: '14px', 
+                minWidth: '56px',
+                borderColor: '#E5E7EB',
+                color: 'text.secondary',
+                '&:hover': { borderColor: 'primary.main', color: 'primary.main', bgcolor: 'primary.50' }
+            }}
+          >
+            <Phone />
+          </Button>
+        </Stack>
       </CardContent>
     </Card>
   )

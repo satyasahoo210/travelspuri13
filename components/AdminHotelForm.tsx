@@ -1,7 +1,7 @@
 'use client'
 
 import { api } from '@/lib/api'
-import { Room, Hotel } from '@/types'
+import { Hotel } from '@/types'
 import {
   Box,
   Button,
@@ -13,49 +13,44 @@ import {
   Switch,
   TextField,
   Typography,
-  MenuItem,
   Grid
 } from '@mui/material'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import useSWR from 'swr'
 
-interface AdminRoomFormProps {
-  room?: Room | null
+interface AdminHotelFormProps {
+  hotel?: Hotel | null
   open: boolean
   onClose: (refresh?: boolean) => void
 }
 
-export default function AdminRoomForm({
-  room,
+export default function AdminHotelForm({
+  hotel,
   open,
   onClose,
-}: AdminRoomFormProps) {
+}: AdminHotelFormProps) {
   const [loading, setLoading] = useState(false)
-  const { data: hotels } = useSWR('getHotels', () => api.getHotels())
-
+  
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm({
-    defaultValues: room
+    defaultValues: hotel
       ? {
-          ...room,
-          image_urls: room.image_urls.join(' | '),
+          ...hotel,
+          image_urls: hotel.image_urls.join(' | '),
         }
       : {
-          hotel_id: '',
           name: '',
-          description: '',
-          price: 0,
-          capacity: '2 Adults',
-          amenities: 'AC, TV, Attached Bath',
+          location: 'Puri',
+          area: '',
+          rating: 4.5,
+          starting_price: 1500,
+          amenities: 'Free WiFi, AC, Geyser, TV',
+          cover_image: '',
           image_urls: '',
-          check_in: '10:00 AM',
-          check_out: '08:00 AM',
-          rules: '',
-          cancellation_policy: '48h refund',
+          is_sponsored: false,
           is_active: true,
         },
   })
@@ -63,15 +58,15 @@ export default function AdminRoomForm({
   const onSubmit = async (data: any) => {
     setLoading(true)
     try {
-      if (room) {
-        await api.updateItem('rooms', { ...data, id: room.id })
+      if (hotel) {
+        await api.updateItem('hotels', { ...data, id: hotel.id })
       } else {
-        await api.addItem('rooms', data)
+        await api.addItem('hotels', data)
       }
       onClose(true)
     } catch (error) {
       console.error(error)
-      alert('Failed to save room')
+      alert('Failed to save hotel')
     } finally {
       setLoading(false)
     }
@@ -88,59 +83,55 @@ export default function AdminRoomForm({
       <form onSubmit={handleSubmit(onSubmit)}>
         <DialogTitle className="pt-8 px-10">
           <Typography variant="h4" fontWeight={900}>
-            {room ? 'Edit Room Entry' : 'Create New Room'}
+            {hotel ? 'Edit Hotel' : 'Add New Hotel'}
           </Typography>
         </DialogTitle>
         <DialogContent className="px-10 py-6">
           <Grid container spacing={3}>
             <Grid size={{ xs: 12, md: 6 }}>
               <TextField
-                {...register('hotel_id', { required: 'Hotel is required' })}
-                select
-                label="Select Hotel"
-                fullWidth
-                error={!!errors.hotel_id}
-                sx={{ mb: 3 }}
-              >
-                {hotels?.map((h) => (
-                  <MenuItem key={h.id} value={h.id}>
-                    {h.name}
-                  </MenuItem>
-                ))}
-              </TextField>
-              <TextField
                 {...register('name', { required: 'Name is required' })}
-                label="Room Name"
+                label="Hotel Name"
                 fullWidth
                 error={!!errors.name}
+                helperText={errors.name?.message as string}
+                sx={{ mb: 3 }}
+              />
+              <TextField
+                {...register('area', { required: 'Area is required' })}
+                label="Area (e.g. Sea Beach, Swargadwar)"
+                fullWidth
+                error={!!errors.area}
                 sx={{ mb: 3 }}
               />
               <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
                 <TextField
-                  {...register('price', { required: 'Required' })}
-                  label="Price"
+                  {...register('rating')}
+                  label="Rating (0-5)"
                   type="number"
+                  inputProps={{ step: 0.1, min: 0, max: 5 }}
                   fullWidth
                 />
                 <TextField
-                  {...register('capacity')}
-                  label="Capacity"
+                  {...register('starting_price', { required: 'Required' })}
+                  label="Starting Price"
+                  type="number"
                   fullWidth
                 />
               </Box>
             </Grid>
             <Grid size={{ xs: 12, md: 6 }}>
                <TextField
-                {...register('description')}
-                label="Description"
+                {...register('amenities')}
+                label="Amenities (Comma separated)"
                 fullWidth
                 multiline
                 rows={2}
                 sx={{ mb: 3 }}
               />
-               <TextField
-                {...register('amenities')}
-                label="Amenities (Comma separated)"
+              <TextField
+                {...register('cover_image')}
+                label="Cover Image (Drive ID/Link)"
                 fullWidth
                 sx={{ mb: 3 }}
               />
@@ -152,20 +143,17 @@ export default function AdminRoomForm({
                 rows={2}
               />
             </Grid>
-            <Grid size={{ xs: 12, md: 6 }}>
-               <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-                <TextField {...register('check_in')} label="Check-in Time" fullWidth />
-                <TextField {...register('check_out')} label="Check-out Time" fullWidth />
-               </Box>
-            </Grid>
-            <Grid size={{ xs: 12, md: 6 }}>
-                <TextField {...register('cancellation_policy')} label="Cancellation Policy" fullWidth />
-            </Grid>
             <Grid size={{ xs: 12 }}>
-                <FormControlLabel
-                    control={<Switch {...register('is_active')} defaultChecked={room ? room.is_active : true} />}
-                    label={<Typography fontWeight={700}>Active Listing</Typography>}
-                />
+                <Box sx={{ display: 'flex', gap: 4, p: 2, bgcolor: 'gray.50', borderRadius: '16px' }}>
+                    <FormControlLabel
+                        control={<Switch {...register('is_sponsored')} defaultChecked={hotel?.is_sponsored} />}
+                        label={<Typography fontWeight={700}>Sponsored Hotel</Typography>}
+                    />
+                    <FormControlLabel
+                        control={<Switch {...register('is_active')} defaultChecked={hotel ? hotel.is_active : true} />}
+                        label={<Typography fontWeight={700}>Active Listing</Typography>}
+                    />
+                </Box>
             </Grid>
           </Grid>
         </DialogContent>
@@ -177,7 +165,7 @@ export default function AdminRoomForm({
             disabled={loading}
             sx={{ borderRadius: '16px', px: 6, py: 1.5, fontWeight: 900 }}
           >
-            {loading ? 'Saving...' : room ? 'Update Room' : 'Add Room'}
+            {loading ? 'Saving...' : hotel ? 'Update Hotel' : 'Create Hotel'}
           </Button>
         </DialogActions>
       </form>
