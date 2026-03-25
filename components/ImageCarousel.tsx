@@ -1,6 +1,6 @@
 'use client'
 
-import { cn } from '@/lib/utils' // Assuming there's a cn utility, if not I'll check
+import { cn } from '@/lib/utils'
 import { IconButton } from '@mui/material'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import Image from 'next/image'
@@ -48,7 +48,8 @@ export default function ImageCarousel({
     setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1))
   }
 
-  const handleTouchStart = (e: React.TouchEvent) => setTouchStart(e.targetTouches[0].clientX)
+  const handleTouchStart = (e: React.TouchEvent) =>
+    setTouchStart(e.targetTouches[0].clientX)
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (touchStart === null) return
     const touchEnd = e.changedTouches[0].clientX
@@ -64,7 +65,10 @@ export default function ImageCarousel({
 
   return (
     <div
-      className={cn('relative group overflow-hidden w-full h-full select-none', className)}
+      className={cn(
+        'relative group overflow-hidden w-full h-full select-none',
+        className,
+      )}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >

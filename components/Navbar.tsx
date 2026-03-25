@@ -1,10 +1,8 @@
 'use client'
 
 import { WHATSAPP_NUMBER } from '@/lib/constants'
-import Logo from '@/public/logo_large.svg'
 import { Button, Container } from '@mui/material'
 import { Menu as MenuIcon, X } from 'lucide-react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'

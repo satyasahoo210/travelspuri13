@@ -63,7 +63,6 @@ export default function Footer() {
               Puri, Odisha, India - 752001
               <br />
               <span className="block mt-2 font-medium text-primary overflow-x-hidden">
-                {/* TODO: fix overflow issue */}
                 Email: {EMAIL_ADDRESS}
               </span>
               <span className="block mt-1 font-medium text-primary">

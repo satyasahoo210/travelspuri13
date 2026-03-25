@@ -1,18 +1,19 @@
 'use client'
 
-import { Chip, Stack } from '@mui/material'
-import { 
-  Wifi as WifiIcon, 
-  AcUnit as AcIcon, 
-  LocalParking as ParkingIcon, 
+import {
+  AcUnit as AcIcon,
+  Power as BackupIcon,
   Restaurant as FoodIcon,
-  Tv as TvIcon,
   Kitchen as KitchenIcon,
+  LocalParking as ParkingIcon,
+  Tv as TvIcon,
   HotTub as WaterIcon,
-  Power as BackupIcon
+  Wifi as WifiIcon,
 } from '@mui/icons-material'
+import { Chip, Stack } from '@mui/material'
+import { ReactElement } from 'react'
 
-const AMENITY_MAP: { [key: string]: { icon: any, label: string } } = {
+const AMENITY_MAP: Record<string, { icon: ReactElement; label: string }> = {
   wifi: { icon: <WifiIcon sx={{ fontSize: 16 }} />, label: 'WiFi' },
   ac: { icon: <AcIcon sx={{ fontSize: 16 }} />, label: 'AC' },
   parking: { icon: <ParkingIcon sx={{ fontSize: 16 }} />, label: 'Parking' },
@@ -29,13 +30,23 @@ interface AmenityChipsProps {
   max?: number
 }
 
-export default function AmenityChips({ amenities, max = 3 }: AmenityChipsProps) {
-  const list = typeof amenities === 'string' 
-    ? amenities.split(',').map(s => s.trim().toLowerCase()) 
-    : amenities.map(s => s.toLowerCase())
+export default function AmenityChips({
+  amenities,
+  max = 3,
+}: AmenityChipsProps) {
+  const list =
+    typeof amenities === 'string'
+      ? amenities.split(',').map((s) => s.trim().toLowerCase())
+      : amenities.map((s) => s.toLowerCase())
 
   return (
-    <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mt: 1 }}>
+    <Stack
+      direction="row"
+      spacing={1}
+      flexWrap="wrap"
+      useFlexGap
+      sx={{ mt: 1 }}
+    >
       {list.slice(0, max).map((item) => {
         const config = AMENITY_MAP[item]
         return (
@@ -45,14 +56,14 @@ export default function AmenityChips({ amenities, max = 3 }: AmenityChipsProps) 
             label={config?.label || item.toUpperCase()}
             size="small"
             variant="outlined"
-            sx={{ 
-                borderRadius: '8px',
-                fontSize: '0.7rem',
-                height: '24px',
-                backgroundColor: 'rgba(255, 255, 255, 0.5)',
-                backdropFilter: 'blur(4px)',
-                borderColor: 'divider',
-                '& .MuiChip-label': { px: 1 }
+            sx={{
+              borderRadius: '8px',
+              fontSize: '0.7rem',
+              height: '24px',
+              backgroundColor: 'rgba(255, 255, 255, 0.5)',
+              backdropFilter: 'blur(4px)',
+              borderColor: 'divider',
+              '& .MuiChip-label': { px: 1 },
             }}
           />
         )
