@@ -1,5 +1,5 @@
-import { api } from '@/lib/api'
 import HomeClient from '@/components/HomeClient'
+import { api } from '@/lib/api'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Travels Puri 13 - Best Hotels in Puri',
     description: 'Your gateway to premium stays in Puri, Odisha.',
-    images: ['/og-image.jpg'], // Should exist or use a real URL
+    images: ['/logo.png'],
   }
 }
 
