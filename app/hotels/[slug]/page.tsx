@@ -34,7 +34,8 @@ export async function generateStaticParams() {
   }))
 }
 
-export const revalidate = 24 * 3600 // Revalidate every day
+export const dynamicParams = true
+export const revalidate = 86400 // Revalidate every day
 
 export default async function HotelPage({
   params,
