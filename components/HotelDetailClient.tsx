@@ -52,15 +52,13 @@ export default function HotelDetailClient({
   rooms,
   relatedHotels,
 }: HotelDetailClientProps) {
-  const { data } = useSWR<Hotel>(
+  const { data: hotel } = useSWR(
     'getHotels',
-    () => api.getHotelBySlug(staleHotel.slug) as Promise<Hotel>,
+    () => api.getHotelBySlug(staleHotel.slug),
     {
       fallbackData: staleHotel,
     },
   )
-
-  const hotel: Hotel = data ?? staleHotel
 
   const [activeImage, setActiveImage] = useState(0)
   const [touchStart, setTouchStart] = useState<number | null>(null)
@@ -118,7 +116,7 @@ export default function HotelDetailClient({
 
   const whatsappMessage = `Hi, I want to inquire about booking:
 
-Hotel: ${hotel.name}
+Hotel: ${hotel!.name}
 Room: ${selectedRoom?.name}
 Check-in: ${checkIn}
 Check-out: ${checkOut}
@@ -140,10 +138,11 @@ Please confirm availability.`
   }
 
   const handleNext = () =>
-    setActiveImage((prev) => (prev + 1) % hotel.image_urls.length)
+    setActiveImage((prev) => (prev + 1) % hotel!.image_urls.length)
   const handlePrev = () =>
     setActiveImage(
-      (prev) => (prev - 1 + hotel.image_urls.length) % hotel.image_urls.length,
+      (prev) =>
+        (prev - 1 + hotel!.image_urls.length) % hotel!.image_urls.length,
     )
 
   const handleTouchStart = (e: React.TouchEvent) =>
@@ -156,6 +155,8 @@ Please confirm availability.`
     if (diff < -50) handlePrev()
     setTouchStart(null)
   }
+
+  if (!hotel) return null
 
   return (
     <div className="min-h-screen bg-slate-50 pb-20 pt-24">
