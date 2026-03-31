@@ -3,6 +3,7 @@
 import AmenityChips from '@/components/AmenityChips'
 import HotelCard from '@/components/HotelCard'
 import RoomCard from '@/components/RoomCard'
+import { api } from '@/lib/api'
 import { WHATSAPP_NUMBER } from '@/lib/constants'
 import { Hotel, Room } from '@/types'
 import {
@@ -38,6 +39,7 @@ import {
 import { Bed, Calendar, Info, Minus, Plus, Users } from 'lucide-react'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
+import useSWR from 'swr'
 
 interface HotelDetailClientProps {
   hotel: Hotel
@@ -46,10 +48,20 @@ interface HotelDetailClientProps {
 }
 
 export default function HotelDetailClient({
-  hotel,
+  hotel: staleHotel,
   rooms,
   relatedHotels,
 }: HotelDetailClientProps) {
+  const { data } = useSWR<Hotel>(
+    'getHotels',
+    () => api.getHotelBySlug(staleHotel.slug) as Promise<Hotel>,
+    {
+      fallbackData: staleHotel,
+    },
+  )
+
+  const hotel: Hotel = data ?? staleHotel
+
   const [activeImage, setActiveImage] = useState(0)
   const [touchStart, setTouchStart] = useState<number | null>(null)
 
