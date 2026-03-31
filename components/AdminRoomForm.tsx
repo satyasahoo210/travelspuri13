@@ -1,7 +1,8 @@
 'use client'
 
 import { api } from '@/lib/api'
-import { Room, Hotel } from '@/types'
+import { deTransformImageUrl } from '@/lib/utils'
+import { Room } from '@/types'
 import {
   Box,
   Button,
@@ -10,11 +11,11 @@ import {
   DialogContent,
   DialogTitle,
   FormControlLabel,
+  Grid,
+  MenuItem,
   Switch,
   TextField,
   Typography,
-  MenuItem,
-  Grid
 } from '@mui/material'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -42,7 +43,8 @@ export default function AdminRoomForm({
     defaultValues: room
       ? {
           ...room,
-          image_urls: room.image_urls.join(' | '),
+          hotel_id: room.hotel_id ?? '',
+          image_urls: deTransformImageUrl(room.image_urls),
         }
       : {
           hotel_id: '',
@@ -83,20 +85,25 @@ export default function AdminRoomForm({
       onClose={() => onClose()}
       maxWidth="md"
       fullWidth
-      PaperProps={{ className: 'rounded-[32px] shadow-2xl border border-white/20' }}
+      slotProps={{
+        paper: {
+          className: 'rounded-[32px] shadow-2xl border border-white/20',
+        },
+      }}
     >
       <form onSubmit={handleSubmit(onSubmit)}>
         <DialogTitle className="pt-8 px-10">
-          <Typography variant="h4" fontWeight={900}>
+          <Typography variant="body1" fontWeight={900} fontSize={'h4.fontSize'}>
             {room ? 'Edit Room Entry' : 'Create New Room'}
           </Typography>
         </DialogTitle>
-        <DialogContent className="px-10 py-6">
+        <DialogContent className="px-10 py-6 pt-2!">
           <Grid container spacing={3}>
             <Grid size={{ xs: 12, md: 6 }}>
               <TextField
                 {...register('hotel_id', { required: 'Hotel is required' })}
                 select
+                defaultValue={room?.hotel_id ?? ''}
                 label="Select Hotel"
                 fullWidth
                 error={!!errors.hotel_id}
@@ -130,7 +137,7 @@ export default function AdminRoomForm({
               </Box>
             </Grid>
             <Grid size={{ xs: 12, md: 6 }}>
-               <TextField
+              <TextField
                 {...register('description')}
                 label="Description"
                 fullWidth
@@ -138,13 +145,13 @@ export default function AdminRoomForm({
                 rows={2}
                 sx={{ mb: 3 }}
               />
-               <TextField
+              <TextField
                 {...register('amenities')}
                 label="Amenities (Comma separated)"
                 fullWidth
                 sx={{ mb: 3 }}
               />
-               <TextField
+              <TextField
                 {...register('image_urls')}
                 label="Gallery Images (IDs/Links separated by | )"
                 fullWidth
@@ -153,27 +160,46 @@ export default function AdminRoomForm({
               />
             </Grid>
             <Grid size={{ xs: 12, md: 6 }}>
-               <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-                <TextField {...register('check_in')} label="Check-in Time" fullWidth />
-                <TextField {...register('check_out')} label="Check-out Time" fullWidth />
-               </Box>
+              <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
+                <TextField
+                  {...register('check_in')}
+                  label="Check-in Time"
+                  fullWidth
+                />
+                <TextField
+                  {...register('check_out')}
+                  label="Check-out Time"
+                  fullWidth
+                />
+              </Box>
             </Grid>
             <Grid size={{ xs: 12, md: 6 }}>
-                <TextField {...register('cancellation_policy')} label="Cancellation Policy" fullWidth />
+              <TextField
+                {...register('cancellation_policy')}
+                label="Cancellation Policy"
+                fullWidth
+              />
             </Grid>
             <Grid size={{ xs: 12 }}>
-                <FormControlLabel
-                    control={<Switch {...register('is_active')} defaultChecked={room ? room.is_active : true} />}
-                    label={<Typography fontWeight={700}>Active Listing</Typography>}
-                />
+              <FormControlLabel
+                control={
+                  <Switch
+                    {...register('is_active')}
+                    defaultChecked={room ? room.is_active : true}
+                  />
+                }
+                label={<Typography fontWeight={700}>Active Listing</Typography>}
+              />
             </Grid>
           </Grid>
         </DialogContent>
         <DialogActions className="px-10 pb-8 pt-4 gap-3">
-          <Button onClick={() => onClose()} sx={{ fontWeight: 800 }}>Cancel</Button>
-          <Button 
-            type="submit" 
-            variant="contained" 
+          <Button onClick={() => onClose()} sx={{ fontWeight: 800 }}>
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            variant="contained"
             disabled={loading}
             sx={{ borderRadius: '16px', px: 6, py: 1.5, fontWeight: 900 }}
           >

@@ -1,6 +1,7 @@
 'use client'
 
 import { api } from '@/lib/api'
+import { deTransformImageUrl } from '@/lib/utils'
 import { Hotel } from '@/types'
 import {
   Box,
@@ -10,10 +11,10 @@ import {
   DialogContent,
   DialogTitle,
   FormControlLabel,
+  Grid,
   Switch,
   TextField,
   Typography,
-  Grid
 } from '@mui/material'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -30,7 +31,7 @@ export default function AdminHotelForm({
   onClose,
 }: AdminHotelFormProps) {
   const [loading, setLoading] = useState(false)
-  
+
   const {
     register,
     handleSubmit,
@@ -39,7 +40,7 @@ export default function AdminHotelForm({
     defaultValues: hotel
       ? {
           ...hotel,
-          image_urls: hotel.image_urls.join(' | '),
+          image_urls: deTransformImageUrl(hotel.image_urls),
         }
       : {
           name: '',
@@ -54,6 +55,8 @@ export default function AdminHotelForm({
           is_active: true,
         },
   })
+
+  console.log(hotel)
 
   const onSubmit = async (data: any) => {
     setLoading(true)
@@ -78,7 +81,11 @@ export default function AdminHotelForm({
       onClose={() => onClose()}
       maxWidth="md"
       fullWidth
-      PaperProps={{ className: 'rounded-[32px] shadow-2xl border border-white/20' }}
+      slotProps={{
+        paper: {
+          className: 'rounded-[32px] shadow-2xl border border-white/20',
+        },
+      }}
     >
       <form onSubmit={handleSubmit(onSubmit)}>
         <DialogTitle className="pt-8 px-10">
@@ -121,7 +128,7 @@ export default function AdminHotelForm({
               </Box>
             </Grid>
             <Grid size={{ xs: 12, md: 6 }}>
-               <TextField
+              <TextField
                 {...register('amenities')}
                 label="Amenities (Comma separated)"
                 fullWidth
@@ -135,7 +142,7 @@ export default function AdminHotelForm({
                 fullWidth
                 sx={{ mb: 3 }}
               />
-               <TextField
+              <TextField
                 {...register('image_urls')}
                 label="Gallery Images (IDs/Links separated by | )"
                 fullWidth
@@ -144,24 +151,48 @@ export default function AdminHotelForm({
               />
             </Grid>
             <Grid size={{ xs: 12 }}>
-                <Box sx={{ display: 'flex', gap: 4, p: 2, bgcolor: 'gray.50', borderRadius: '16px' }}>
-                    <FormControlLabel
-                        control={<Switch {...register('is_sponsored')} defaultChecked={hotel?.is_sponsored} />}
-                        label={<Typography fontWeight={700}>Sponsored Hotel</Typography>}
+              <Box
+                sx={{
+                  display: 'flex',
+                  gap: 4,
+                  p: 2,
+                  bgcolor: 'gray.50',
+                  borderRadius: '16px',
+                }}
+              >
+                <FormControlLabel
+                  control={
+                    <Switch
+                      {...register('is_sponsored')}
+                      defaultChecked={hotel?.is_sponsored}
                     />
-                    <FormControlLabel
-                        control={<Switch {...register('is_active')} defaultChecked={hotel ? hotel.is_active : true} />}
-                        label={<Typography fontWeight={700}>Active Listing</Typography>}
+                  }
+                  label={
+                    <Typography fontWeight={700}>Sponsored Hotel</Typography>
+                  }
+                />
+                <FormControlLabel
+                  control={
+                    <Switch
+                      {...register('is_active')}
+                      defaultChecked={hotel ? hotel.is_active : true}
                     />
-                </Box>
+                  }
+                  label={
+                    <Typography fontWeight={700}>Active Listing</Typography>
+                  }
+                />
+              </Box>
             </Grid>
           </Grid>
         </DialogContent>
         <DialogActions className="px-10 pb-8 pt-4 gap-3">
-          <Button onClick={() => onClose()} sx={{ fontWeight: 800 }}>Cancel</Button>
-          <Button 
-            type="submit" 
-            variant="contained" 
+          <Button onClick={() => onClose()} sx={{ fontWeight: 800 }}>
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            variant="contained"
             disabled={loading}
             sx={{ borderRadius: '16px', px: 6, py: 1.5, fontWeight: 900 }}
           >

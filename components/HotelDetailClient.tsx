@@ -6,38 +6,38 @@ import RoomCard from '@/components/RoomCard'
 import { WHATSAPP_NUMBER } from '@/lib/constants'
 import { Hotel, Room } from '@/types'
 import {
-    ChevronLeft,
-    ChevronRight,
-    LocationOn,
-    Phone,
-    Policy,
-    WhatsApp,
+  ChevronLeft,
+  ChevronRight,
+  LocationOn,
+  Phone,
+  Policy,
+  WhatsApp,
 } from '@mui/icons-material'
 import {
-    Box,
-    Button,
-    Chip,
-    Container,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    Divider,
-    FormControl,
-    Grid,
-    IconButton,
-    InputLabel,
-    MenuItem,
-    Paper,
-    Rating,
-    Select,
-    Stack,
-    TextField,
-    Typography,
+  Box,
+  Button,
+  Chip,
+  Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  FormControl,
+  Grid,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Rating,
+  Select,
+  Stack,
+  TextField,
+  Typography,
 } from '@mui/material'
 import { Bed, Calendar, Info, Minus, Plus, Users } from 'lucide-react'
 import Image from 'next/image'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 interface HotelDetailClientProps {
   hotel: Hotel
@@ -56,11 +56,23 @@ export default function HotelDetailClient({
   // Booking State
   const [checkIn, setCheckIn] = useState('')
   const [checkOut, setCheckOut] = useState('')
+  const [noOfRooms, setNoOfRooms] = useState(1)
   const [adults, setAdults] = useState(2)
   const [children, setChildren] = useState(0)
   const [selectedRoomId, setSelectedRoomId] = useState(rooms[0]?.id || '')
   const [isBreakdownOpen, setIsBreakdownOpen] = useState(false)
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
+
+  useEffect(() => {
+    setAdults(
+      Math.min(
+        (rooms.find((r) => r.id === selectedRoomId)?.capacity || 3) * noOfRooms,
+        adults,
+      ),
+    )
+    setChildren(Math.min(3 * noOfRooms, children))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [noOfRooms])
 
   const selectedRoom = rooms.find((r) => r.id === selectedRoomId) || rooms[0]
 
@@ -359,7 +371,11 @@ Please confirm availability.`
                     onChange={(e) => setCheckIn(e.target.value)}
                     error={!!errors.checkIn}
                     helperText={errors.checkIn}
-                    InputLabelProps={{ shrink: true }}
+                    slotProps={{
+                      inputLabel: {
+                        shrink: true,
+                      },
+                    }}
                     sx={{
                       '& .MuiOutlinedInput-root': { borderRadius: '16px' },
                     }}
@@ -380,7 +396,7 @@ Please confirm availability.`
                     }}
                   />
                 </Grid>
-                <Grid size={{ xs: 12, md: 6 }}>
+                <Grid size={{ xs: 12, sm: 6 }}>
                   <FormControl
                     fullWidth
                     sx={{
@@ -401,72 +417,167 @@ Please confirm availability.`
                     </Select>
                   </FormControl>
                 </Grid>
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Grid size={{ xs: 12, sm: 6 }}>
                   <Box>
-                    <Typography variant="caption" fontWeight={700} color="text.secondary" sx={{ mb: 1, display: 'block' }}>
-                      Adults
+                    <Typography
+                      variant="caption"
+                      fontWeight={700}
+                      color="text.secondary"
+                      sx={{ display: 'block' }}
+                    >
+                      No. of Rooms
                     </Typography>
-                    <Box 
-                      sx={{ 
-                        display: 'flex', 
-                        alignItems: 'center', 
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
                         justifyContent: 'space-between',
                         bgcolor: '#F8FAFC',
                         borderRadius: '16px',
                         p: 0.5,
-                        border: '1px solid #E2E8F0'
+                        border: '1px solid #E2E8F0',
                       }}
                     >
-                      <IconButton 
-                        size="small" 
-                        onClick={() => setAdults(Math.max(1, adults - 1))}
-                        disabled={adults <= 1}
-                        sx={{ bgcolor: 'white', '&:hover': { bgcolor: 'primary.50' } }}
+                      <IconButton
+                        size="small"
+                        onClick={() => setNoOfRooms(Math.max(1, noOfRooms - 1))}
+                        disabled={noOfRooms <= 1}
+                        sx={{
+                          bgcolor: 'white',
+                          '&:hover': { bgcolor: 'primary.50' },
+                        }}
                       >
                         <Minus size={18} />
                       </IconButton>
-                      <Typography fontWeight={900} variant="h6">{adults}</Typography>
-                      <IconButton 
-                        size="small" 
-                        onClick={() => setAdults(Math.min(rooms.find((r) => r.id === selectedRoomId)?.capacity || 3, adults + 1))}
-                        disabled={adults >= (rooms.find((r) => r.id === selectedRoomId)?.capacity || 3)}
-                        sx={{ bgcolor: 'white', '&:hover': { bgcolor: 'primary.50' } }}
+                      <Typography fontWeight={900} variant="h6">
+                        {noOfRooms}
+                      </Typography>
+                      <IconButton
+                        size="small"
+                        onClick={() =>
+                          setNoOfRooms(
+                            Math.min(
+                              selectedRoom.no_of_rooms_available || 1,
+                              noOfRooms + 1,
+                            ),
+                          )
+                        }
+                        disabled={
+                          noOfRooms >= (selectedRoom.no_of_rooms_available || 1)
+                        }
+                        sx={{
+                          bgcolor: 'white',
+                          '&:hover': { bgcolor: 'primary.50' },
+                        }}
                       >
                         <Plus size={18} />
                       </IconButton>
                     </Box>
                   </Box>
                 </Grid>
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Grid size={{ xs: 12, sm: 6 }}>
                   <Box>
-                    <Typography variant="caption" fontWeight={700} color="text.secondary" sx={{ mb: 1, display: 'block' }}>
-                      Children
+                    <Typography
+                      variant="caption"
+                      fontWeight={700}
+                      color="text.secondary"
+                      sx={{ display: 'block' }}
+                    >
+                      Adults
                     </Typography>
-                    <Box 
-                      sx={{ 
-                        display: 'flex', 
-                        alignItems: 'center', 
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
                         justifyContent: 'space-between',
                         bgcolor: '#F8FAFC',
                         borderRadius: '16px',
                         p: 0.5,
-                        border: '1px solid #E2E8F0'
+                        border: '1px solid #E2E8F0',
                       }}
                     >
-                      <IconButton 
-                        size="small" 
-                        onClick={() => setChildren(Math.max(0, children - 1))}
-                        disabled={children <= 0}
-                        sx={{ bgcolor: 'white', '&:hover': { bgcolor: 'primary.50' } }}
+                      <IconButton
+                        size="small"
+                        onClick={() => setAdults(Math.max(1, adults - 1))}
+                        disabled={adults <= 1}
+                        sx={{
+                          bgcolor: 'white',
+                          '&:hover': { bgcolor: 'primary.50' },
+                        }}
                       >
                         <Minus size={18} />
                       </IconButton>
-                      <Typography fontWeight={900} variant="h6">{children}</Typography>
-                      <IconButton 
-                        size="small" 
-                        onClick={() => setChildren(Math.min(3, children + 1))}
-                        disabled={children >= 3}
-                        sx={{ bgcolor: 'white', '&:hover': { bgcolor: 'primary.50' } }}
+                      <Typography fontWeight={900} variant="h6">
+                        {adults}
+                      </Typography>
+                      <IconButton
+                        size="small"
+                        onClick={() =>
+                          setAdults(
+                            Math.min(
+                              (selectedRoom?.capacity || 3) * noOfRooms,
+                              adults + 1,
+                            ),
+                          )
+                        }
+                        disabled={
+                          adults >= (selectedRoom?.capacity || 3) * noOfRooms
+                        }
+                        sx={{
+                          bgcolor: 'white',
+                          '&:hover': { bgcolor: 'primary.50' },
+                        }}
+                      >
+                        <Plus size={18} />
+                      </IconButton>
+                    </Box>
+                  </Box>
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <Box>
+                    <Typography
+                      variant="caption"
+                      fontWeight={700}
+                      color="text.secondary"
+                      sx={{ display: 'block' }}
+                    >
+                      Children
+                    </Typography>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        bgcolor: '#F8FAFC',
+                        borderRadius: '16px',
+                        p: 0.5,
+                        border: '1px solid #E2E8F0',
+                      }}
+                    >
+                      <IconButton
+                        size="small"
+                        onClick={() => setChildren(Math.max(0, children - 1))}
+                        disabled={children <= 0}
+                        sx={{
+                          bgcolor: 'white',
+                          '&:hover': { bgcolor: 'primary.50' },
+                        }}
+                      >
+                        <Minus size={18} />
+                      </IconButton>
+                      <Typography fontWeight={900} variant="h6">
+                        {children}
+                      </Typography>
+                      <IconButton
+                        size="small"
+                        onClick={() =>
+                          setChildren(Math.min(3 * noOfRooms, children + 1))
+                        }
+                        disabled={children >= 3 * noOfRooms}
+                        sx={{
+                          bgcolor: 'white',
+                          '&:hover': { bgcolor: 'primary.50' },
+                        }}
                       >
                         <Plus size={18} />
                       </IconButton>
