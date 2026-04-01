@@ -48,18 +48,10 @@ interface HotelDetailClientProps {
 }
 
 export default function HotelDetailClient({
-  hotel: staleHotel,
+  hotel,
   rooms,
   relatedHotels,
 }: HotelDetailClientProps) {
-  const { data: hotel } = useSWR(
-    'getHotels',
-    () => api.getHotelBySlug(staleHotel.slug),
-    {
-      fallbackData: staleHotel,
-    },
-  )
-
   const [activeImage, setActiveImage] = useState(0)
   const [touchStart, setTouchStart] = useState<number | null>(null)
 
