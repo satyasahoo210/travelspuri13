@@ -685,7 +685,7 @@ Please confirm availability.`
                         Check-in
                       </Typography>
                       <Typography variant="h6" fontWeight={900}>
-                        10:00 AM
+                        08:00 AM
                       </Typography>
                     </Box>
                     <Box
@@ -711,7 +711,7 @@ Please confirm availability.`
                         Check-out
                       </Typography>
                       <Typography variant="h6" fontWeight={900}>
-                        08:00 AM
+                        07:00 AM
                       </Typography>
                     </Box>
                   </Box>
