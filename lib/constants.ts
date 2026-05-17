@@ -1,5 +1,5 @@
-export const EMAIL_ADDRESS = 'padhibalaram86@gmail.com'
-export const WHATSAPP_NUMBER = '918249548564'
+export const EMAIL_ADDRESS = 'travelspuri13@gmail.com'
+export const WHATSAPP_NUMBER = '917077977229'
 export const API_URL = process.env.NEXT_PUBLIC_API_URL || ''
 
 export const NAV_LINKS = [
