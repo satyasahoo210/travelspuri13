@@ -1,21 +1,20 @@
-'use client';
+'use client'
 
-import { MessageCircle } from 'lucide-react';
+import { MessageCircle } from 'lucide-react'
 
 interface WhatsAppButtonProps {
-  phoneNumber?: string;
-  message?: string;
+  phoneNumber?: string
+  message?: string
 }
 
-export default function WhatsAppButton({ 
-  phoneNumber = '918249548564', 
-  message = 'Hi, I would like to enquire about your services.' 
+export default function WhatsAppButton({
+  phoneNumber = '917077977229',
+  message = 'Hi, I would like to enquire about your services.',
 }: WhatsAppButtonProps) {
-  
   const handleClick = () => {
-    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-    window.open(url, '_blank');
-  };
+    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
+    window.open(url, '_blank')
+  }
 
   return (
     <button
@@ -25,5 +24,5 @@ export default function WhatsAppButton({
     >
       <MessageCircle size={28} className="group-hover:animate-pulse" />
     </button>
-  );
+  )
 }

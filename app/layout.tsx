@@ -12,20 +12,10 @@ const inter = Inter({
   subsets: ['latin'],
 })
 
-/**
-🌟 Welcome to Hotels in  Puri Where Comfort Meets Luxury! 🌟
-Contact us: [8249548564]
-Experience world-class hospitality, elegant accommodations, and exceptional service at Hotels. Whether you're traveling for business or leisure, our stylish rooms, fine dining, and top-notch amenities ensure a memorable stay.
-
-📍 Prime Location | 🏨 Luxurious Rooms | 🍽️ Exquisite Dining | 🎉 Event Spaces | 🏊‍♂️ Relaxing Ambiance
-
-Book your 📞 Contact us: [8249548564]
- */
-
 export const metadata: Metadata = {
   title: 'Travels Puri 13 | Best Hotel Aggregator & Travel Guide in Puri',
   description:
-    "Compare and book the finest hotels in Puri. Travels Puri 13 is your premium hotel aggregator, offering curated stays, best price guarantees, and seamless booking for a perfect spiritual retreat.",
+    'Compare and book the finest hotels in Puri. Travels Puri 13 is your premium hotel aggregator, offering curated stays, best price guarantees, and seamless booking for a perfect spiritual retreat.',
   keywords: [
     'Puri Hotel Aggregator',
     'Best Hotels in Puri',

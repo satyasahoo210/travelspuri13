@@ -58,7 +58,7 @@ export default function Footer() {
               Contact Detail
             </Typography>
             <Typography className="text-secondary leading-relaxed text-sm">
-              Bimanabadu Sahi, Sarbamangala Pathagara
+              Tiadi Sahi, Bali Sahi
               <br />
               Puri, Odisha, India - 752001
               <br />
