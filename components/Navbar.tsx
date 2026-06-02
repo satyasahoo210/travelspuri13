@@ -10,7 +10,6 @@ import { useState } from 'react'
 const navItems = [
   { name: 'Home', path: '/' },
   { name: 'Hotels', path: '/hotels' },
-  { name: 'Admin', path: '/admin' },
 ]
 
 export default function Navbar() {
@@ -28,7 +27,6 @@ export default function Navbar() {
           <span className="text-accent underline decoration-2 underline-offset-4">
             PURI 13
           </span>
-          {/* <Image src={Logo} alt={'TRAVELS PURI 13'} className="h-15" /> */}
         </Link>
 
         {/* Desktop Menu */}
@@ -37,9 +35,8 @@ export default function Navbar() {
             <Link
               key={item.path}
               href={item.path}
-              className={`text-sm font-medium transition-colors hover:text-accent ${
-                pathname === item.path ? 'text-accent' : 'text-secondary'
-              }`}
+              className={`text-sm font-medium transition-colors hover:text-accent ${pathname === item.path ? 'text-accent' : 'text-secondary'
+                }`}
             >
               {item.name}
             </Link>
@@ -73,9 +70,8 @@ export default function Navbar() {
               key={item.path}
               href={item.path}
               onClick={() => setIsMenuOpen(false)}
-              className={`text-lg font-medium ${
-                pathname === item.path ? 'text-accent' : 'text-secondary'
-              }`}
+              className={`text-lg font-medium ${pathname === item.path ? 'text-accent' : 'text-secondary'
+                }`}
             >
               {item.name}
             </Link>

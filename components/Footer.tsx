@@ -41,12 +41,6 @@ export default function Footer() {
               >
                 Explore Hotels
               </Link>
-              <Link
-                href="/admin"
-                className="text-secondary hover:text-accent transition-colors text-sm"
-              >
-                Admin Portal
-              </Link>
             </Box>
           </Grid>
 
