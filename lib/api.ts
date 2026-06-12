@@ -1,6 +1,6 @@
-import { ApiResponse, Hotel, Room } from '@/types'
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
+import { Hotel, Room } from '@/types'
+import { apolloClient } from './graphql/client'
+import { GET_PUBLIC_HOTELS, GET_PUBLIC_HOTEL_BY_SLUG, GET_PUBLIC_ROOMS } from './graphql/queries'
 
 export const fetcher = async (url: string) => {
   const res = await fetch(url)
@@ -11,10 +11,10 @@ export const fetcher = async (url: string) => {
 export const api = {
   getHotels: async (): Promise<Hotel[]> => {
     try {
-      const res = await fetch(`${API_URL}/public/hotels`)
-      if (!res.ok) throw new Error('Failed to fetch hotels')
-      const data = await res.json()
-      return data;
+      const { data } = await apolloClient.query({
+        query: GET_PUBLIC_HOTELS,
+      })
+      return data?.getPublicHotels || []
     } catch (error) {
       console.error('getHotels failed:', error)
       return []
@@ -24,10 +24,11 @@ export const api = {
   getRooms: async (hotelId?: string): Promise<Room[]> => {
     try {
       if (!hotelId) return []
-      const res = await fetch(`${API_URL}/public/rooms?hotelId=${hotelId}`)
-      if (!res.ok) throw new Error('Failed to fetch rooms')
-      const data = await res.json()
-      return data;
+      const { data } = await apolloClient.query({
+        query: GET_PUBLIC_ROOMS,
+        variables: { hotelId },
+      })
+      return data?.getPublicRooms || []
     } catch (error) {
       console.error('getRooms failed:', error)
       return []
@@ -36,13 +37,11 @@ export const api = {
 
   getHotelBySlug: async (slug: string): Promise<Hotel | null> => {
     try {
-      const res = await fetch(`${API_URL}/public/hotels/${slug}`)
-      if (!res.ok) {
-        if (res.status === 404) return null
-        throw new Error('Failed to fetch hotel details')
-      }
-      const data = await res.json()
-      return data
+      const { data } = await apolloClient.query({
+        query: GET_PUBLIC_HOTEL_BY_SLUG,
+        variables: { slug },
+      })
+      return data?.getPublicHotelBySlug || null
     } catch (error) {
       console.error('getHotelBySlug failed:', error)
       return null
