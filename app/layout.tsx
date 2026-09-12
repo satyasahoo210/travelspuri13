@@ -13,6 +13,7 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://travelspuri13.com'),
   title: 'Travels Puri 13 | Best Hotel Aggregator & Travel Guide in Puri',
   description:
     'Compare and book the finest hotels in Puri. Travels Puri 13 is your premium hotel aggregator, offering curated stays, best price guarantees, and seamless booking for a perfect spiritual retreat.',
