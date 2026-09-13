@@ -15,9 +15,11 @@ import {
   WhatsApp,
 } from '@mui/icons-material'
 import {
+  Alert,
   Box,
   Button,
   Chip,
+  CircularProgress,
   Container,
   Dialog,
   DialogActions,
@@ -36,10 +38,11 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
-import { Bed, Calendar, Info, Minus, Plus, Users } from 'lucide-react'
+import { Bed, Calendar, CheckCircle2, Info, Minus, Plus, Sparkles, Users } from 'lucide-react'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
+
 
 interface HotelDetailClientProps {
   hotel: Hotel
@@ -64,6 +67,22 @@ export default function HotelDetailClient({
   const [selectedRoomId, setSelectedRoomId] = useState(rooms[0]?.id || '')
   const [isBreakdownOpen, setIsBreakdownOpen] = useState(false)
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
+
+  // Guest Details State
+  const [guestName, setGuestName] = useState('')
+  const [guestPhone, setGuestPhone] = useState('')
+  const [guestEmail, setGuestEmail] = useState('')
+  const [guestNotes, setGuestNotes] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState('')
+  const [bookingResult, setBookingResult] = useState<{
+    success: boolean
+    bookingId?: string
+    referenceNumber?: string
+    status?: string
+    totalAmount?: number
+    message?: string
+  } | null>(null)
 
   useEffect(() => {
     setAdults(
@@ -102,11 +121,57 @@ export default function HotelDetailClient({
 
   const handleProceed = () => {
     if (validate()) {
+      setSubmitError('')
+      setBookingResult(null)
       setIsBreakdownOpen(true)
     }
   }
 
-  const whatsappMessage = `Hi, I want to inquire about booking:
+  const handleSubmitBooking = async () => {
+    if (!guestName.trim()) {
+      setSubmitError('Please enter your full name')
+      return
+    }
+    if (!guestPhone.trim() || guestPhone.replace(/\D/g, '').length < 10) {
+      setSubmitError('Please enter a valid 10-digit phone number')
+      return
+    }
+    setSubmitError('')
+    setIsSubmitting(true)
+    try {
+      const res = await api.createPublicBooking({
+        hotelId: hotel.id,
+        roomTypeId: selectedRoom?.id || rooms[0]?.id,
+        guestName: guestName.trim(),
+        guestPhone: guestPhone.trim(),
+        guestEmail: guestEmail.trim() || undefined,
+        checkInDate: checkIn,
+        checkOutDate: checkOut,
+        adults: adults,
+        children: children,
+        noOfRooms: noOfRooms,
+        notes: guestNotes.trim() || undefined,
+      })
+      if (res.success) {
+        setBookingResult(res)
+      } else {
+        setSubmitError(res.message || 'Failed to submit booking inquiry')
+      }
+    } catch (err: any) {
+      setSubmitError(err.message || 'Error communicating with PMS server')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const whatsappMessage = bookingResult?.referenceNumber
+    ? `Hi, I just submitted booking inquiry #${bookingResult.referenceNumber} for ${hotel!.name} (${selectedRoom?.name}).
+Dates: ${checkIn} to ${checkOut} (${getNights()} nights)
+Guests: ${adults} Adults, ${children} Children
+Guest Name: ${guestName}
+
+Please confirm our reservation!`
+    : `Hi, I want to inquire about booking:
 
 Hotel: ${hotel!.name}
 Room: ${selectedRoom?.name}
@@ -114,12 +179,13 @@ Check-in: ${checkIn}
 Check-out: ${checkOut}
 Nights: ${getNights()}
 Guests: ${adults} Adults, ${children} Children
-
+${guestName ? `Guest Name: ${guestName}\n` : ''}
 Approx Price: ₹${totalPrice}
 
 Please confirm availability.`
 
   const bookingWhatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`
+
 
   const handleRoomSelect = (roomId: string) => {
     setSelectedRoomId(roomId)
@@ -897,7 +963,7 @@ Please confirm availability.`
             </Stack>
           </Grid>
         </Grid>
-        {/* Price Breakdown Dialog */}
+        {/* Price Breakdown & PMS Booking Dialog */}
         <Dialog
           open={isBreakdownOpen}
           onClose={() => setIsBreakdownOpen(false)}
@@ -905,179 +971,293 @@ Please confirm availability.`
             sx: {
               borderRadius: '32px',
               p: 2,
-              maxWidth: '500px',
+              maxWidth: '520px',
               width: '100%',
               m: 2,
             },
           }}
         >
-          <DialogTitle sx={{ fontWeight: 900, fontSize: '1.5rem', pb: 1 }}>
-            Booking Summary
-          </DialogTitle>
-          <DialogContent>
-            <Box
-              sx={{
-                bgcolor: '#F8FAFC',
-                p: 3,
-                borderRadius: '24px',
-                border: '1px solid #E2E8F0',
-                mb: 3,
-              }}
-            >
-              <Stack spacing={2.5}>
+          {bookingResult?.success ? (
+            <>
+              <DialogTitle sx={{ fontWeight: 900, fontSize: '1.5rem', pb: 1, textAlign: 'center' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'center', mb: 1, color: '#10B981' }}>
+                  <CheckCircle2 size={48} />
+                </Box>
+                Inquiry Received!
+              </DialogTitle>
+              <DialogContent>
                 <Box
                   sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
+                    bgcolor: '#ECFDF5',
+                    p: 3,
+                    borderRadius: '24px',
+                    border: '1px solid #A7F3D0',
+                    mb: 3,
+                    textAlign: 'center',
                   }}
                 >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                    <Box sx={{ color: 'primary.main' }}>
-                      <Bed size={20} />
+                  <Typography variant="body2" color="text.secondary" fontWeight={600} sx={{ mb: 0.5 }}>
+                    Your PMS Reservation Reference
+                  </Typography>
+                  <Typography
+                    variant="h4"
+                    fontWeight={950}
+                    sx={{
+                      letterSpacing: 2,
+                      color: '#065F46',
+                      fontFamily: 'monospace',
+                      py: 1,
+                    }}
+                  >
+                    {bookingResult.referenceNumber}
+                  </Typography>
+                  <Chip
+                    label="Logged in Hotel Operations System"
+                    color="success"
+                    size="small"
+                    sx={{ fontWeight: 700, mt: 0.5 }}
+                  />
+                </Box>
+
+                <Box
+                  sx={{
+                    bgcolor: '#F8FAFC',
+                    p: 2.5,
+                    borderRadius: '20px',
+                    border: '1px solid #E2E8F0',
+                    mb: 2,
+                  }}
+                >
+                  <Stack spacing={1.5}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography variant="body2" color="text.secondary">Hotel</Typography>
+                      <Typography variant="body2" fontWeight={700}>{hotel!.name}</Typography>
                     </Box>
-                    <Typography fontWeight={700}>
-                      {selectedRoom?.name}
-                    </Typography>
-                  </Box>
-                  <Typography fontWeight={800} color="primary">
-                    ₹{selectedRoom?.price}/night
-                  </Typography>
-                </Box>
-
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                  }}
-                >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                    <Box sx={{ color: 'text.secondary' }}>
-                      <Calendar size={20} />
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography variant="body2" color="text.secondary">Room</Typography>
+                      <Typography variant="body2" fontWeight={700}>{selectedRoom?.name}</Typography>
                     </Box>
-                    <Typography
-                      variant="body2"
-                      fontWeight={600}
-                      color="text.secondary"
-                    >
-                      {checkIn || '---'} to {checkOut || '---'}
-                    </Typography>
-                  </Box>
-                  <Typography variant="body2" fontWeight={700}>
-                    {getNights()} Nights
-                  </Typography>
-                </Box>
-
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                  }}
-                >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                    <Box sx={{ color: 'text.secondary' }}>
-                      <Users size={20} />
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography variant="body2" color="text.secondary">Dates</Typography>
+                      <Typography variant="body2" fontWeight={700}>{checkIn} to {checkOut} ({getNights()}N)</Typography>
                     </Box>
-                    <Typography
-                      variant="body2"
-                      fontWeight={600}
-                      color="text.secondary"
-                    >
-                      {adults} Adults, {children} Children
-                    </Typography>
-                  </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography variant="body2" color="text.secondary">Guests</Typography>
+                      <Typography variant="body2" fontWeight={700}>{adults} Adults{children > 0 ? `, ${children} Children` : ''}</Typography>
+                    </Box>
+                    <Divider sx={{ borderStyle: 'dashed' }} />
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography variant="subtitle2" fontWeight={800}>Estimated Total</Typography>
+                      <Typography variant="subtitle2" fontWeight={900} color="primary">₹{totalPrice}</Typography>
+                    </Box>
+                  </Stack>
                 </Box>
 
-                <Divider sx={{ borderStyle: 'dashed' }} />
-
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                  }}
-                >
-                  <Typography variant="h6" fontWeight={900}>
-                    Total (approx)
-                  </Typography>
-                  <Typography variant="h5" fontWeight={950} color="primary">
-                    ₹{totalPrice}
-                  </Typography>
-                </Box>
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: 'text.secondary',
-                    fontStyle: 'italic',
-                    textAlign: 'right',
-                    mt: -1,
-                    display: 'block',
-                  }}
-                >
-                  *Excluding taxes and service fees
+                <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', px: 1 }}>
+                  Our front desk team has received your details and will hold your room inquiry. You can also message us directly on WhatsApp with your reference number for instant confirmation!
                 </Typography>
-              </Stack>
-            </Box>
+              </DialogContent>
+              <DialogActions sx={{ p: 3, pt: 0, flexDirection: 'column', gap: 1.5 }}>
+                <Button
+                  fullWidth
+                  variant="contained"
+                  size="large"
+                  startIcon={<WhatsApp />}
+                  href={bookingWhatsappUrl}
+                  target="_blank"
+                  sx={{
+                    bgcolor: '#25D366',
+                    color: 'white',
+                    '&:hover': { bgcolor: '#1fad53' },
+                    borderRadius: '16px',
+                    py: 1.75,
+                    fontWeight: 800,
+                    fontSize: '1rem',
+                    textTransform: 'none',
+                  }}
+                >
+                  Chat with Hotel on WhatsApp
+                </Button>
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  onClick={() => setIsBreakdownOpen(false)}
+                  sx={{
+                    borderRadius: '16px',
+                    py: 1.25,
+                    fontWeight: 700,
+                    textTransform: 'none',
+                  }}
+                >
+                  Close & Back to Hotel
+                </Button>
+              </DialogActions>
+            </>
+          ) : (
+            <>
+              <DialogTitle sx={{ fontWeight: 900, fontSize: '1.4rem', pb: 1 }}>
+                Complete Your Booking Inquiry
+              </DialogTitle>
+              <DialogContent>
+                <Box
+                  sx={{
+                    bgcolor: '#F8FAFC',
+                    p: 2.5,
+                    borderRadius: '20px',
+                    border: '1px solid #E2E8F0',
+                    mb: 2.5,
+                  }}
+                >
+                  <Stack spacing={1.5}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Bed size={18} color="#0284C7" />
+                        <Typography variant="body2" fontWeight={700}>
+                          {selectedRoom?.name}
+                        </Typography>
+                      </Box>
+                      <Typography variant="body2" fontWeight={800} color="primary">
+                        ₹{selectedRoom?.price}/nt
+                      </Typography>
+                    </Box>
 
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'start',
-                gap: 1.5,
-                p: 2,
-                bgcolor: 'primary.50',
-                borderRadius: '16px',
-                color: 'primary.dark',
-              }}
-            >
-              <Box sx={{ mt: 0.5 }}>
-                <Info size={18} />
-              </Box>
-              <Typography variant="body2" fontWeight={500}>
-                Clicking proceed will open WhatsApp with these details. Our team
-                will then confirm the availability.
-              </Typography>
-            </Box>
-          </DialogContent>
-          <DialogActions sx={{ p: 3, pt: 0, flexDirection: 'column', gap: 2 }}>
-            <Button
-              fullWidth
-              variant="contained"
-              size="large"
-              startIcon={<WhatsApp />}
-              href={bookingWhatsappUrl}
-              target="_blank"
-              onClick={() => setIsBreakdownOpen(false)}
-              sx={{
-                bgcolor: '#25D366',
-                color: 'white',
-                '&:hover': { bgcolor: '#1fad53' },
-                borderRadius: '16px',
-                py: 2,
-                fontWeight: 900,
-                fontSize: '1.1rem',
-                textTransform: 'none',
-              }}
-            >
-              Proceed to WhatsApp
-            </Button>
-            <Button
-              fullWidth
-              variant="text"
-              onClick={() => setIsBreakdownOpen(false)}
-              sx={{
-                fontWeight: 700,
-                color: 'text.secondary',
-                textTransform: 'none',
-              }}
-            >
-              Modify Selection
-            </Button>
-          </DialogActions>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Calendar size={18} color="#64748B" />
+                        <Typography variant="body2" color="text.secondary">
+                          {checkIn || '---'} to {checkOut || '---'}
+                        </Typography>
+                      </Box>
+                      <Typography variant="body2" fontWeight={700}>
+                        {getNights()} Nights
+                      </Typography>
+                    </Box>
+
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Users size={18} color="#64748B" />
+                        <Typography variant="body2" color="text.secondary">
+                          {adults} Adults{children > 0 ? `, ${children} Children` : ''} • {noOfRooms} Room(s)
+                        </Typography>
+                      </Box>
+                    </Box>
+
+                    <Divider sx={{ borderStyle: 'dashed' }} />
+
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Typography variant="body1" fontWeight={800}>
+                        Estimated Total
+                      </Typography>
+                      <Typography variant="h6" fontWeight={950} color="primary">
+                        ₹{totalPrice}
+                      </Typography>
+                    </Box>
+                  </Stack>
+                </Box>
+
+                {submitError && (
+                  <Alert severity="error" sx={{ mb: 2, borderRadius: '12px' }}>
+                    {submitError}
+                  </Alert>
+                )}
+
+                {/* Guest Contact Form */}
+                <Typography variant="subtitle2" fontWeight={800} sx={{ mb: 1.5 }}>
+                  Guest Contact Details
+                </Typography>
+                <Stack spacing={1.5}>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    label="Full Name *"
+                    placeholder="e.g. Satya Mishra"
+                    value={guestName}
+                    onChange={(e) => setGuestName(e.target.value)}
+                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                  />
+                  <TextField
+                    fullWidth
+                    size="small"
+                    label="Phone Number *"
+                    placeholder="e.g. 9876543210"
+                    value={guestPhone}
+                    onChange={(e) => setGuestPhone(e.target.value)}
+                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                  />
+                  <TextField
+                    fullWidth
+                    size="small"
+                    label="Email Address (Optional)"
+                    placeholder="e.g. satya@example.com"
+                    value={guestEmail}
+                    onChange={(e) => setGuestEmail(e.target.value)}
+                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                  />
+                  <TextField
+                    fullWidth
+                    size="small"
+                    label="Special Requests / Notes"
+                    placeholder="e.g. Early check-in requested, ground floor preferred"
+                    value={guestNotes}
+                    onChange={(e) => setGuestNotes(e.target.value)}
+                    multiline
+                    rows={2}
+                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                  />
+                </Stack>
+              </DialogContent>
+              <DialogActions sx={{ p: 3, pt: 1, flexDirection: 'column', gap: 1.5 }}>
+                <Button
+                  fullWidth
+                  variant="contained"
+                  size="large"
+                  onClick={handleSubmitBooking}
+                  disabled={isSubmitting}
+                  startIcon={isSubmitting ? <CircularProgress size={20} color="inherit" /> : <Sparkles size={20} />}
+                  sx={{
+                    borderRadius: '16px',
+                    py: 1.75,
+                    fontWeight: 800,
+                    fontSize: '1rem',
+                    textTransform: 'none',
+                    boxShadow: '0 8px 24px rgba(2, 132, 199, 0.25)',
+                  }}
+                >
+                  {isSubmitting ? 'Submitting to PMS...' : 'Submit Booking Inquiry'}
+                </Button>
+                <Button
+                  fullWidth
+                  variant="text"
+                  startIcon={<WhatsApp />}
+                  href={bookingWhatsappUrl}
+                  target="_blank"
+                  onClick={() => setIsBreakdownOpen(false)}
+                  sx={{
+                    color: '#16A34A',
+                    fontWeight: 700,
+                    textTransform: 'none',
+                  }}
+                >
+                  Or Inquire Directly via WhatsApp
+                </Button>
+                <Button
+                  fullWidth
+                  variant="text"
+                  onClick={() => setIsBreakdownOpen(false)}
+                  sx={{
+                    fontWeight: 600,
+                    color: 'text.secondary',
+                    textTransform: 'none',
+                  }}
+                >
+                  Modify Selection
+                </Button>
+              </DialogActions>
+            </>
+          )}
         </Dialog>
       </Container>
     </div>
   )
 }
+

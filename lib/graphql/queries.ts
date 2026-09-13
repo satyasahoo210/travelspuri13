@@ -77,3 +77,17 @@ export const GET_PUBLIC_ROOMS: TypedDocumentNode<
     }
   }
 `;
+
+export const CREATE_PUBLIC_BOOKING = gql`
+  mutation CreatePublicBooking($input: CreatePublicBookingInput!) {
+    createPublicBooking(input: $input) {
+      success
+      bookingId
+      referenceNumber
+      status
+      totalAmount
+      message
+    }
+  }
+`;
+

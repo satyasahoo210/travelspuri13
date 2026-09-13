@@ -1,6 +1,29 @@
 import { Hotel, Room } from '@/types'
 import { apolloClient } from './graphql/client'
-import { GET_PUBLIC_HOTELS, GET_PUBLIC_HOTEL_BY_SLUG, GET_PUBLIC_ROOMS } from './graphql/queries'
+import { GET_PUBLIC_HOTELS, GET_PUBLIC_HOTEL_BY_SLUG, GET_PUBLIC_ROOMS, CREATE_PUBLIC_BOOKING } from './graphql/queries'
+
+export interface CreateBookingPayload {
+  hotelId: string
+  roomTypeId: string
+  guestName: string
+  guestPhone: string
+  guestEmail?: string
+  checkInDate: string
+  checkOutDate: string
+  adults: number
+  children?: number
+  noOfRooms: number
+  notes?: string
+}
+
+export interface BookingResponse {
+  success: boolean
+  bookingId?: string
+  referenceNumber?: string
+  status?: string
+  totalAmount?: number
+  message: string
+}
 
 export const fetcher = async (url: string) => {
   const res = await fetch(url)
@@ -47,4 +70,25 @@ export const api = {
       return null
     }
   },
+
+  createPublicBooking: async (payload: CreateBookingPayload): Promise<BookingResponse> => {
+    try {
+      const { data } = await apolloClient.mutate<{ createPublicBooking: BookingResponse }>({
+        mutation: CREATE_PUBLIC_BOOKING,
+        variables: { input: payload },
+      })
+      return data?.createPublicBooking || {
+        success: false,
+        message: 'Failed to create booking inquiry',
+      }
+    } catch (error: any) {
+      console.error('createPublicBooking failed:', error)
+      return {
+        success: false,
+        message: error.message || 'Error communicating with PMS server',
+      }
+    }
+  },
+
 }
+
