@@ -7,6 +7,8 @@ export const metadata: Metadata = {
   description: 'Browse all available hotels in Puri. Filter by price, rating, and amenities to find your ideal accommodation.',
 }
 
+export const revalidate = 60 // Revalidate every 60 seconds (ISR)
+
 export default async function HotelsPage() {
   const hotels = await api.getHotels()
   

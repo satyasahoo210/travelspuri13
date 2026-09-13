@@ -35,7 +35,7 @@ export async function generateStaticParams() {
 }
 
 export const dynamicParams = true
-export const revalidate = 3600 // Revalidate every hour
+export const revalidate = 60 // Revalidate every 60 seconds (ISR)
 
 export default async function HotelPage({
   params,
