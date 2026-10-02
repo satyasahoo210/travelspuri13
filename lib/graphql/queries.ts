@@ -54,6 +54,18 @@ export const GET_PUBLIC_HOTELS: TypedDocumentNode<
   }
 `;
 
+export const GET_PUBLIC_HOTEL_SLUGS: TypedDocumentNode<
+  { getPublicHotels: { slug: string }[] },
+  Record<string, never>
+> = gql`
+  query GetPublicHotelSlugs {
+    getPublicHotels {
+      slug
+    }
+  }
+`;
+
+
 export const GET_PUBLIC_HOTEL_BY_SLUG: TypedDocumentNode<
   { getPublicHotelBySlug: Hotel | null },
   { slug: string }

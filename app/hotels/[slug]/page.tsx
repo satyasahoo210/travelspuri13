@@ -27,12 +27,13 @@ export async function generateMetadata({
 }
 
 export async function generateStaticParams() {
-  const hotels = await api.getHotels()
+  const slugs = await api.getHotelSlugs()
 
-  return hotels.map((hotel) => ({
+  return slugs.map((hotel) => ({
     slug: hotel.slug,
   }))
 }
+
 
 export const dynamicParams = true
 export const revalidate = 60 // Revalidate every 60 seconds (ISR)

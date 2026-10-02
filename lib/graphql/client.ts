@@ -10,4 +10,12 @@ export const apolloClient = new ApolloClient({
     uri,
   }),
   cache: new InMemoryCache(),
+  defaultOptions: {
+    watchQuery: {
+      fetchPolicy: 'cache-and-network'
+    },
+    query: {
+      fetchPolicy: 'no-cache',
+    }
+  }
 });
